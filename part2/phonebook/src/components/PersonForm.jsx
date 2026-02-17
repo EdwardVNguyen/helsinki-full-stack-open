@@ -1,4 +1,4 @@
-const PersonForm = ( {persons, setPersons, newName, setNewName, newPhoneNumber, setNewPhoneNumber} ) => {
+const PersonForm = ( {persons, setPersons, newName, setNewName, newNumber, setNewNumber} ) => {
   // prevent any identical names in phonebook
   const addNewPerson = (event) => {
     if (persons.some( person => person.name === newName)) {
@@ -10,12 +10,12 @@ const PersonForm = ( {persons, setPersons, newName, setNewName, newPhoneNumber, 
     event.preventDefault()
     const nameObject = {
       name: newName,
-      phoneNumber: newPhoneNumber,
-      id: persons.length + 1
+      number: newNumber,
+      id: (persons.length + 1).toString()
     }
     setPersons(persons.concat(nameObject))
     setNewName('')
-    setNewPhoneNumber('')
+    setNewNumber('')
   }
 
   // handler functions for name and phone number
@@ -23,7 +23,7 @@ const PersonForm = ( {persons, setPersons, newName, setNewName, newPhoneNumber, 
     setNewName(event.target.value)
   }
   const handleNewPhoneNumberChange = (event) => {
-    setNewPhoneNumber(event.target.value)
+    setNewNumber(event.target.value)
   }
 
   // form with name and phone number inputs
@@ -33,7 +33,7 @@ const PersonForm = ( {persons, setPersons, newName, setNewName, newPhoneNumber, 
           Name: <input value={newName} onChange={handleNewNameChange} />
         </div>
         <div>
-          Number: <input value={newPhoneNumber} onChange={handleNewPhoneNumberChange}/>
+          Number: <input value={newNumber} onChange={handleNewPhoneNumberChange}/>
         </div>
         <div>
           <button type="submit">add</button>
