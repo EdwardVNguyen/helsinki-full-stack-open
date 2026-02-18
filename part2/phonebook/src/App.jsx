@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
+import personService from './services/persons.js'
 
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
@@ -13,11 +13,26 @@ const App = () => {
 
   // use external web api to fetch data from json server to get initial values for persons
   useEffect( () => {
-    axios
-      .get('http://localhost:3001/persons')
-      .then(response => setPersons(response.data))
+    personService
+      .getAll()
+      .then(returnedPersons => setPersons(returnedPersons))
   }, [])
-  
+
+  // delete person from json server, reason why we set function on app is because we want to set state for persons
+  const deletePerson = id => {
+    // confirm on whether to delete person
+    if (!(window.confirm("Delete this person?"))) {
+      return
+    }
+      
+    personService
+      .deleteObject(id)
+      .then( response => {
+        const personObj = response.data
+        setPersons( persons.filter(person => person.id !== personObj.id))
+      })
+ }
+
   return (
     <div>
       <h2>Phonebook</h2>
@@ -32,7 +47,7 @@ const App = () => {
           setNewNumber={setNewNumber}
         /> 
       <h3>Numbers</h3>
-      <Persons filterPerson={filterPerson} persons={persons} />
+      <Persons filterPerson={filterPerson} persons={persons} deletePerson={deletePerson}/>
     </div>
   )
 }

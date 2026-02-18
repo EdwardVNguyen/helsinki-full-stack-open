@@ -1,21 +1,34 @@
+import personService from '../services/persons.js'
+
 const PersonForm = ( {persons, setPersons, newName, setNewName, newNumber, setNewNumber} ) => {
   // prevent any identical names in phonebook
   const addNewPerson = (event) => {
+    event.preventDefault() // IMPORTANT: to prevent the form from refreshing before we can do actions
     if (persons.some( person => person.name === newName)) {
-      alert(`${newName} is already added to phonebook`)
-      return
-    } 
-
-    // add new name and phone number to phonebook list
-    event.preventDefault()
-    const nameObject = {
-      name: newName,
-      number: newNumber,
-      id: (persons.length + 1).toString()
+      if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
+        // create shallow copy and update state
+        const changedPerson = {...persons.find(person => person.name === newName), number: newNumber}
+        personService
+          .updateObj(changedPerson.id, changedPerson)
+          .then(returnedPerson => {
+            setPersons(persons.map(person => person.id === changedPerson.id ? returnedPerson : person))
+          })
+      } else {
+        console.log("User decided not to replace old number")
+      } 
+    } else {
+      // add new name and phone number to phonebook list
+      const nameObject = {
+        name: newName,
+        number: newNumber,
+      }
+      personService.create(nameObject)
+      .then(returnedObject => {
+        setPersons(persons.concat(returnedObject))
+        setNewName('')
+        setNewNumber('')
+      })
     }
-    setPersons(persons.concat(nameObject))
-    setNewName('')
-    setNewNumber('')
   }
 
   // handler functions for name and phone number
