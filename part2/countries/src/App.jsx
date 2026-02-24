@@ -13,6 +13,10 @@ function App() {
     setSearchedCountry(event.target.value)
   }
 
+  const handleShowCountry = (country) => {
+    setSearchedCountry(country)
+  }
+
   // useEffect reruns axios request to get list of countries when there is a change to the input
   useEffect( () => {
     if (searchedCountry !== '') {
@@ -32,13 +36,10 @@ function App() {
           console.log(error)
         })
     }
-
-
   }, [searchedCountry])
 
-  // useEffect reruns axios request to get data of speicifc country according to change in listOfCountries
+  // useEffect reruns axios request to get data of specific country according to change in listOfCountries
   useEffect( () => {
-
     if (listOfCountries.length === 1) {
       axios
         .get(`https://studies.cs.helsinki.fi/restcountries/api/name/${listOfCountries.at(0)}`)
@@ -68,7 +69,7 @@ function App() {
                   // https://stackoverflow.com/questions/40950546/react-js-right-way-to-iterate-over-object-instead-of-object-entries
                   // iterate over each value and append to list
                   Object.entries(singleCountryObj.languages).map(([key,value]) => 
-                    <li>{value}</li>
+                    <li key={crypto.randomUUID()}>{value}</li>
                   ) 
                 }
               </ul>
@@ -78,10 +79,10 @@ function App() {
             ? <p> Too many matches, specify another filter</p>
             : <ul>
                 {
-                  // index is not a good solution, but good enough in this circumstance since listOfCountries is newly created each time its updated
-                  listOfCountries.map( (country, index) => 
-                    <li key={index}>
-                      {country}
+                  // use crypto library to create unique ids 
+                  listOfCountries.map( country => 
+                    <li key={crypto.randomUUID()}>
+                      {country} <button onClick={ () => handleShowCountry(country) }>Show</button>
                     </li>
                   )
                 }
