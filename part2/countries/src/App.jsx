@@ -7,11 +7,13 @@ import axios from 'axios'
 function App() {
   const [searchedCountry, setSearchedCountry] = useState('')
   const [listOfCountries, setListOfCountries] = useState([])
+  const [singleCountryObj, setSingleCountryObj] = useState(null)
 
   const handleSetSearchedCountryName = (event) => {
     setSearchedCountry(event.target.value)
   }
 
+  // useEffect reruns axios request to get list of countries when there is a change to the input
   useEffect( () => {
     if (searchedCountry !== '') {
       axios
@@ -31,25 +33,59 @@ function App() {
         })
     }
 
+
   }, [searchedCountry])
+
+  // useEffect reruns axios request to get data of speicifc country according to change in listOfCountries
+  useEffect( () => {
+
+    if (listOfCountries.length === 1) {
+      axios
+        .get(`https://studies.cs.helsinki.fi/restcountries/api/name/${listOfCountries.at(0)}`)
+        .then(response => {
+          const specifiedCountry = response.data
+          setSingleCountryObj({...specifiedCountry})
+        })
+        .catch(error => console.log(error))
+    }
+  }, [listOfCountries])
 
   return (
     <div>
       <h1> Find Countries </h1> 
       <input value={searchedCountry} onChange={handleSetSearchedCountryName}/>
       {
-        (listOfCountries.length > 10)
-          ? <div> Too many matches, specify another filter</div>
-          : <ul>
-              {
-                // index is not a good solution, but good enough in this circumstance since listOfCountries is newly created each time its updated
-                listOfCountries.map( (country, index) => 
-                  <li key={index}>
-                    {country}
-                  </li>
-                )
-              }
-            </ul>
+        // if list of countries is 1, show full info on that country, else if list of countries is at least less than 10, then show those list of county names, else output to the user that there are too many matches
+        (listOfCountries.length === 1 && singleCountryObj !== null) // tricky, have to do conditional rendering so that axios gets info before render
+          ?
+            <article>
+              <h1>{singleCountryObj.name.common}</h1>
+              <p>Capital: {singleCountryObj.capital}</p>
+              <p>Area: {singleCountryObj.area}</p>
+              <h2>Languages</h2>
+              <ul>
+                {
+                  // https://stackoverflow.com/questions/40950546/react-js-right-way-to-iterate-over-object-instead-of-object-entries
+                  // iterate over each value and append to list
+                  Object.entries(singleCountryObj.languages).map(([key,value]) => 
+                    <li>{value}</li>
+                  ) 
+                }
+              </ul>
+              <div>{singleCountryObj.flag}</div>
+            </article>   
+          : (listOfCountries.length > 10)
+            ? <p> Too many matches, specify another filter</p>
+            : <ul>
+                {
+                  // index is not a good solution, but good enough in this circumstance since listOfCountries is newly created each time its updated
+                  listOfCountries.map( (country, index) => 
+                    <li key={index}>
+                      {country}
+                    </li>
+                  )
+                }
+              </ul>
       }
     </div>
   )
