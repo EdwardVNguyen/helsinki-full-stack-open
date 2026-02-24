@@ -74,6 +74,7 @@ function App() {
                 }
               </ul>
               <div>{singleCountryObj.flag}</div>
+              <h2>Weather for {singleCountryObj.capital}</h2>
             </article>   
           : (listOfCountries.length > 10)
             ? <p> Too many matches, specify another filter</p>
